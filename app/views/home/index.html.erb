@@ -1,0 +1,93 @@
+<div class='content'>
+  <div class="title">
+    <h1><%= image_tag 'logo_in_nav_44x36.png' %>Crawler</h1>
+  </div>
+
+  <div class="form">
+    <div class="notice">
+      <%= notice %>
+    </div>
+    <div class="tabs">
+      <a href="javascript:void(0);" class='tab active' data-tab='followers'>Seguidores da Empresa</a>
+    </div>
+
+    <div id="followers">
+      <%= form_tag followers_path(format: 'xlsx') do  %>
+        <div class="field">
+          <%= label_tag :email %>
+          <%= text_field_tag :email %>
+        </div>
+        <div class="field">
+          <%= label_tag :user %>
+          <%= text_field_tag :user %>
+        </div>
+        <div class="field">
+          <%= label_tag :password %>
+          <%= password_field_tag :password %>
+        </div>
+        <div class="field">
+          <%= label_tag :company_id %>
+          <%= text_field_tag :company_id %>
+        </div>
+        <%= submit_tag 'Exportar', class: 'btn' %>
+        <small>
+          O InCrawler não armazena nenhum dos dados acima,
+          mas caso mesmo assim você não esteja seguro em colocar sua senha, o código se encontra no <a href="#">GitHub</a> com instruções de como rodar na sua própria máquina
+        </small>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="pay">
+    <p>Concorrentes similáres cobram <a href='#'>500 dólares mensais</a> pelas suas ferramentas</p>
+    <p>O custo para utilizar o INCrawler é o preço que reprezenta quanto de valor geramos para você</p>
+
+    <% values = {
+      um_real:    'R$ 1',
+      dois_reals: 'R$ 2',
+      cinco_reais:'R$ 5',
+      dez_reais:  'R$ 10',
+      vinte_reais:'R$ 20',
+      cinquenta_reais: 'R$ 50',
+      cem_reais: 'R$ 100'
+    } %>
+
+    <div class="tabs">
+      <a href="javascript:void(0);" class='tab' data-tab='zero_valor'>Zero</a>
+      <% values.each_with_index do |k, index| %>
+        <a href="javascript:void(0);" class='tab <%= index == 3 ? 'active' : '' %>' data-tab='<%= k[0] %>'><%= k[1] %></a>
+      <% end %>
+      <!-- <a href="javascript:void(0);" class='tab' data-tab='outro_valor'>Outro</a> -->
+    </div>
+
+    <div id="zero_valor" style="display:none;">
+      <%= form_for Payment.new do |f| %>
+        <p>Ficamos tristes em saber que não estamos gerando nenhum valor, poderia nos informar como podemos melhorar?</p>
+        <div class="field">
+          <%= f.hidden_field :value, value: 0 %>
+          <%= f.text_area :justify %>
+        </div>
+        <%= f.submit "Enviar Crítica Construtiva", class: 'btn' %>
+      <% end %>
+    </div>
+
+    <% values.each_with_index do |k, index| %>
+      <div id="<%= k[0] %>" style='display:<%= index == 3 ? 'block' : 'none' %>'>
+        <%= form_for Payment.new do |f| %>
+          <p>Por favor, nos informe como podemos gerar mais valor para você e assim merecer um pagamento maior que <%= k[1] %></p>
+          <div class="field">
+            <%= f.hidden_field :value, value: k[1].split(' ')[1].to_i %>
+            <%= f.text_area :justify %>
+          </div>
+          <%= submit_tag "Pagar #{k[1]}", class: 'btn' %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div id="outro_valor" style="display:none;">
+    </div>
+  </div>
+
+  <div class="footer">
+  </div>
+</div>

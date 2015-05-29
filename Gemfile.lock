@@ -41,6 +41,9 @@ GEM
       htmlentities (~> 4.3.1)
       nokogiri (>= 1.4.1)
       rubyzip (~> 1.0.0)
+    axlsx_rails (0.3.0)
+      axlsx (>= 2.0.1)
+      rails (>= 3.1)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
@@ -175,7 +178,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  axlsx
+  axlsx_rails
   byebug
   coffee-rails (~> 4.1.0)
   jbuilder (~> 2.0)

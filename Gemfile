@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'nokogiri'
 gem 'mechanize'
-gem 'axlsx'
+gem 'axlsx_rails'
 
 gem 'pry', group: :development
 
