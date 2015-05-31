@@ -13,7 +13,7 @@ class In
     @followers = []
 
     agent.get("https://www.linkedin.com/uas/login?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fcompany%2F#{company_id}%2Ffollowers&fromSignIn=") do |login_page|
-      p 'Login Page'
+      logger.info 'Login Page'
       followers_page = login(login_page)
       find_all_followers(agent, followers_page)
     end
@@ -21,19 +21,40 @@ class In
     @followers
   end
 
+  def analitic(company_id)
+    agent = Mechanize.new { |a| a.follow_meta_refresh = true }
+    analitics = []
+
+    agent.get("https://www.linkedin.com/uas/login?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fcompany%2F#{company_id}%2Fanalytics%3Ftrk%3Dtop_nav_analytics&fromSignIn=") do |login_page|
+      logger.info 'Login Page'
+      analitic_page = login(login_page)
+      company_number = analitic_page.body.match("company=([1-9]*)")[1]
+      analitics << find_updates(agent, company_number)
+    end
+
+    analitics
+  end
+
   private
 
-  # def export_to_excel(result)
-  #   Axlsx::Package.new do |p|
-  #     p.workbook.add_worksheet(name: 'result') do |sheet|
-  #       sheet.add_row result.first.keys
-  #       result.each do |follower|
-  #         sheet.add_row follower.values
-  #       end
-  #     end
-  #     p.serialize('results.xlsx')
-  #   end
-  # end
+  def find_updates(agent, company_number)
+    updates = []
+    agent.get("https://www.linkedin.com/biz/#{company_number}/analytics/statusUpdatesTable?pathWildcard=#{company_number}&start=0&count=100000000&trk=") do |update_page|
+      Nokogiri::HTML(update_page.content).css(".single-update").each do |item|
+        updates << {
+          preview: item.css('.preview').first.text,
+          date: item.css('.date').first.text,
+          audience: item.css('.audience').first.text,
+          impressions: item.css('.impressions').first.text,
+          clicks: item.css('.clicks').first.text,
+          interactions: item.css('.social-actions').first.text,
+          followers_acquired: item.css('.followers-acquired').first.text,
+          engagement: item.css('.engagement').first.text
+        }
+      end
+    end
+    updates
+  end
 
   def find_all_followers(agent, followers_page)
     p @followers.count
@@ -77,12 +98,16 @@ class In
   end
 
   def login(login_page)
-    p 'Login'
+    logger.info 'Login'
     form = login_page.form
 
     form.session_key = @user
     form.session_password = @password
 
     form.submit
+  end
+
+  def logger
+    Rails.logger
   end
 end

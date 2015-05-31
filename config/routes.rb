@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   root 'home#index'
   post 'home/followers', as: 'followers'
+  post 'home/analitics', as: 'analitics'
   resources :payments, only: [:create]
 
   # The priority is based upon order of creation: first created -> highest priority.
