@@ -30,6 +30,7 @@ class In
       analitic_page = login(login_page)
       company_number = analitic_page.body.match("company=([1-9]*)")[1]
       analitics << find_updates(agent, company_number)
+      analitics << find_hyc(agent, company_number)
     end
 
     analitics
@@ -54,6 +55,21 @@ class In
       end
     end
     updates
+  end
+
+  def find_hyc(agent, company_number)
+    companies = []
+    agent.get("https://www.linkedin.com/company/_internal/mappers/analyticsFollowerHyc?companyId=#{company_number}") do |hyc_page|
+      companies.concat(JSON.parse(hyc_page.content)["content"]["biz_analytics_follower_hyc"]["companies"])
+      companies.each do |company|
+        company.delete("i18n_analytics_follower_view")
+        company.delete("fmtAuto_number_1")
+        company.delete("isCurrentCompany")
+        company.delete("squareLogoId")
+        company["company_logo"] = company.delete("_company_logo")["media_picture_link_400"]
+      end
+    end
+    companies
   end
 
   def find_all_followers(agent, followers_page)
