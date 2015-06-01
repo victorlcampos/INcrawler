@@ -1,24 +1,23 @@
 require 'open-uri'
 
 class In
-  attr_accessor :user, :password
+  attr_accessor :user, :password, :email
 
-  def initialize(user, password)
+  def initialize(user, password, email)
     @user = user
     @password = password
+    @email = email
   end
 
   def followers(company_id)
     agent = Mechanize.new { |a| a.follow_meta_refresh = true }
-    @followers = []
 
     agent.get("https://www.linkedin.com/uas/login?session_redirect=https%3A%2F%2Fwww%2Elinkedin%2Ecom%2Fcompany%2F#{company_id}%2Ffollowers&fromSignIn=") do |login_page|
       logger.info 'Login Page'
       followers_page = login(login_page)
-      find_all_followers(agent, followers_page)
-    end
 
-    @followers
+      self.delay.find_all_followers(agent, followers_page, @email)
+    end
   end
 
   def analitic(company_id)
@@ -37,6 +36,10 @@ class In
   end
 
   private
+
+  def send_to_email(result, email, template)
+    LinkedinMailer.export(result, email, template).deliver_now
+  end
 
   def find_updates(agent, company_number)
     updates = []
@@ -72,35 +75,32 @@ class In
     companies
   end
 
-  def find_all_followers(agent, followers_page)
-    p @followers.count
+  def find_all_followers(agent, followers_page, email, followers = [])
+    logger.info followers.count
 
     next_page_link = followers_page.link_with(text: /avançar/)
 
-    return unless next_page_link
+    send_to_email(followers, email, 'followers') unless next_page_link
 
     followers_page = agent.click(next_page_link)
 
-    followers_from_page(agent, followers_page)
-    find_all_followers(agent, followers_page)
+    followers = followers_from_page(agent, followers_page, followers)
+    find_all_followers(agent, followers_page, email, followers)
   end
 
-  def followers_from_page(agent, followers_page)
-    threads = []
+  def followers_from_page(agent, followers_page, followers)
     followers_page.search('.feed-item').each do |item|
-      threads << Thread.new do
-        follower = {
-          name: item.search('a')[1].text,
-          title: item.search('.title').text,
-          city: locations(item)[0],
-          country: locations(item)[1],
-          contact: contact(agent, item)
-        }
+      follower = {
+        name: item.search('a')[1].text,
+        title: item.search('.title').text,
+        city: locations(item)[0],
+        country: locations(item)[1],
+        contact: contact(agent, item)
+      }
 
-        @followers << follower
-      end
+      followers << follower
     end
-    threads.each(&:join)
+    followers
   end
 
   def contact(agent, item)
