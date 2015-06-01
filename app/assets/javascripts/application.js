@@ -18,3 +18,9 @@
 
 var INcrawler = {};
 INcrawler.ui = {};
+
+$(document).ready(function() {
+  $('[data-ui-module]').each(function() {
+    INcrawler.ui[$(this).data('ui-module')].init(this);
+  });
+});

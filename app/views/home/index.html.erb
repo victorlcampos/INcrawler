@@ -7,7 +7,7 @@
     <div class="notice">
       <%= notice %>
     </div>
-    <div class="tabs">
+    <div class="tabs" data-ui-module='tabs'>
       <a href="javascript:void(0);" class='tab active' data-tab='followers'>Seguidores da Empresa</a>
       <a href="javascript:void(0);" class='tab' data-tab='analitic'>Análise</a>
     </div>
@@ -80,7 +80,7 @@
       cem_reais: 'R$ 100'
     } %>
 
-    <div class="tabs">
+    <div class="tabs" data-ui-module='tabs'>
       <a href="javascript:void(0);" class='tab' data-tab='zero_valor'>Zero</a>
       <% values.each_with_index do |k, index| %>
         <a href="javascript:void(0);" class='tab <%= index == 3 ? 'active' : '' %>' data-tab='<%= k[0] %>'><%= k[1] %></a>
