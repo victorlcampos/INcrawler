@@ -6,7 +6,10 @@ class HomeController < ApplicationController
 
   def followers
     @result = @linkedin.followers(params[:company_id])
-    render :result
+  end
+
+  def analitics
+    @result = @linkedin.analitic(params[:company_id])
   end
 
   private
