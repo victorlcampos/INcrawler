@@ -17,7 +17,7 @@
 //= require_tree .
 
 var INcrawler = {};
-INcrawler.ui = {};
+INcrawler.ui  = {};
 
 $(document).ready(function() {
   $('[data-ui-module]').each(function() {
