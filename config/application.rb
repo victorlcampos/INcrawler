@@ -23,5 +23,8 @@ module INcrawler
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
     config.active_job.queue_adapter = :delayed_job
+
+    config.action_mailer.delivery_method = Rails.application.secrets.action_mailer.delivery_method
+    config.action_mailer.smtp_settings   = Rails.application.secrets.action_mailer.smtp_settings
   end
 end
