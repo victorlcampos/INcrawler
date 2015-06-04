@@ -1,6 +1,6 @@
-wb = xlsx_package.workbook
+@wb = xlsx_package.workbook
 
-wb.add_worksheet(name: 'Sheet') do |sheet|
+@wb.add_worksheet(name: 'Sheet') do |sheet|
   if result.first
     sheet.add_row @result.first.keys
     result.each do |row|

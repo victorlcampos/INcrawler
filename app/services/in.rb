@@ -16,7 +16,7 @@ class In
       logger.info 'Login Page'
       followers_page = login(login_page)
 
-      self.delay.find_all_followers(agent, followers_page, @email)
+      InAsync.new.find_all_followers(agent, followers_page, @email)
     end
   end
 
@@ -36,10 +36,6 @@ class In
   end
 
   private
-
-  def send_to_email(result, email, template)
-    LinkedinMailer.export(result, email, template).deliver_now
-  end
 
   def find_updates(agent, company_number)
     updates = []
@@ -73,44 +69,6 @@ class In
       end
     end
     companies
-  end
-
-  def find_all_followers(agent, followers_page, email, followers = [])
-    logger.info followers.count
-
-    next_page_link = followers_page.link_with(text: /avançar/)
-
-    send_to_email(followers, email, 'followers') unless next_page_link
-
-    followers_page = agent.click(next_page_link)
-
-    followers = followers_from_page(agent, followers_page, followers)
-    find_all_followers(agent, followers_page, email, followers)
-  end
-
-  def followers_from_page(agent, followers_page, followers)
-    followers_page.search('.feed-item').each do |item|
-      follower = {
-        name: item.search('a')[1].text,
-        title: item.search('.title').text,
-        city: locations(item)[0],
-        country: locations(item)[1],
-        contact: contact(agent, item)
-      }
-
-      followers << follower
-    end
-    followers
-  end
-
-  def contact(agent, item)
-    follower_page = agent.click(item.search('a')[1])
-    follower_page.search('#contact-comments-view').text
-  end
-
-  def locations(item)
-    locations = item.search('.location').text.split(',')
-    locations.length > 1 ? [locations[0], locations[1]] : ['', locations[0]]
   end
 
   def login(login_page)

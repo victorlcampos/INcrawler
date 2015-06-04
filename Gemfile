@@ -1,10 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'delayed_job_active_record'
-
 gem 'nokogiri'
 gem 'mechanize'
 gem 'axlsx_rails'
+
+gem 'delayed_job_active_record'
+gem 'parallel'
+gem 'puma'
 
 gem 'pry', group: :development
 

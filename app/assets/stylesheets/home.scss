@@ -85,8 +85,16 @@ form {
   background: #E7E9EC;
   border-right: 1px solid;
   border-left: 1px solid;
+  padding-top: 5px;
   div {
     padding: 5px;
+  }
+  .notice {
+    border: darkgreen solid;
+    background: green;
+    color: white;
+    width: 98%;
+    margin: auto;
   }
 }
 

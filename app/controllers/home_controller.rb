@@ -6,6 +6,7 @@ class HomeController < ApplicationController
 
   def followers
     @result = @linkedin.followers(params[:company_id])
+    redirect_to root_path, notice: 'Um email com o Excel será enviado para você'
   end
 
   def analitics
@@ -15,6 +16,6 @@ class HomeController < ApplicationController
   private
 
   def init_linkedin
-    @linkedin = In.new(params[:user], params[:password])
+    @linkedin = In.new(params[:user], params[:password], params[:email])
   end
 end
