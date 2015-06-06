@@ -16,9 +16,10 @@ class In
       logger.info 'Login Page'
       followers_page = login(login_page)
 
-      InAsync.new.find_all_followers(agent, followers_page, @email)
+      find_all_followers(agent, followers_page, @email)
     end
   end
+  handle_asynchronously :followers
 
   def analitic(company_id)
     agent = Mechanize.new { |a| a.follow_meta_refresh = true }
@@ -32,10 +33,50 @@ class In
       analitics << find_hyc(agent, company_number)
     end
 
-    analitics
+    send_to_email(analitics, @email, 'analitics')
   end
+  handle_asynchronously :analitic
 
   private
+
+  def find_all_followers(agent, followers_page, email, followers = [])
+    next_page_link = followers_page.link_with(text: /avançar/)
+
+    return send_to_email(followers, email, 'followers') unless next_page_link
+    followers_page = agent.click(next_page_link)
+
+    followers = followers.concat(followers_from_page(agent, followers_page))
+
+    find_all_followers(agent, followers_page, email, followers)
+  end
+
+  def send_to_email(result, email, template)
+    LinkedinMailer.export(result, email, template).deliver_now
+  end
+
+  def followers_from_page(agent, followers_page)
+    Parallel.map(followers_page.search('.feed-item')) do |item|
+      follower = {
+        name: item.search('a')[1].text,
+        title: item.search('.title').text,
+        city: locations(item)[0],
+        country: locations(item)[1],
+        contact: contact(agent, item)
+      }
+
+      follower
+    end
+  end
+
+  def contact(agent, item)
+    follower_page = agent.click(item.search('a')[1])
+    follower_page.search('#contact-comments-view').text
+  end
+
+  def locations(item)
+    locations = item.search('.location').text.split(',')
+    locations.length > 1 ? [locations[0], locations[1]] : ['', locations[0]]
+  end
 
   def find_updates(agent, company_number)
     updates = []

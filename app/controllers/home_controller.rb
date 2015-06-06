@@ -11,6 +11,7 @@ class HomeController < ApplicationController
 
   def analitics
     @result = @linkedin.analitic(params[:company_id])
+    redirect_to root_path, notice: 'Um email com o Excel será enviado para você'
   end
 
   private

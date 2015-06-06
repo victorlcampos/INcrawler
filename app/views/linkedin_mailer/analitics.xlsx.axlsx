@@ -1,6 +1,6 @@
 wb = xlsx_package.workbook
 
-@result.each_with_index do |page, idx|
+result.each_with_index do |page, idx|
   wb.add_worksheet(name: "Sheet #{idx + 1}") do |sheet|
     if page.first
       sheet.add_row page.first.keys
@@ -10,3 +10,5 @@ wb = xlsx_package.workbook
     end
   end
 end
+
+wb
